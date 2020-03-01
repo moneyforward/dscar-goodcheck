@@ -1,0 +1,64 @@
+version: 2.1
+
+description: Delta Goodcheck reports
+orbs:
+  dscar: naokikimura/dscar@0.1.0
+commands:
+  execute:
+    description: Calculate the difference of Goodcheck results between HEAD branch and BASE branch
+    parameters:
+      starting-points:
+        description: Specify the path of starting to search for files to analyze (Multiple paths can be specified by separating them with line feed)
+        type: string
+        default: "."
+      test-results-path:
+        description: Specify the value of the path parameter in the store_test_results step if you need to change it
+        type: string
+        default: "/tmp/test-results"
+    steps:
+      - dscar/execute:
+          prepare-to-execute:
+            - run:
+                name: Install Goodcheck
+                command: |
+                  sudo apt-get install jq
+                  sudo gem install goodcheck
+          analysis-name: Goodcheck
+          analysis-command: goodcheck
+          analysis-arguments: check --format=json
+          analysis-result-transformation-command: jq
+          prepare-to-analyze:
+            - run:
+                name: export TRANSFORMATION_ARGUMENTS
+                command: |
+                  set -x
+                  cat \<<-EOT >> $BASH_ENV
+                  export TRANSFORMATION_ARGUMENTS=(
+                    -rM
+                    'map(@html "<testsuite id=\"0\" package=\"goodcheck\" name=\"\(.path)\" timestamp=\"`date '+%Y-%m-%dT%H:%M:%S'`\" hostname=\"`hostname`\" tests=\"1\" failures=\"1\" errors=\"0\" time=\"0\"><properties /><system-out /><system-err /><testcase name=\"scan\" classname=\"Goodcheck::Analyzer\" time=\"0\"><failure type=\"\(.rule_id)\">\(if .location == null then "" else .location end) \(.message)</failure></testcase></testsuite>") | "<testsuites>\(.[])</testsuites>"'
+                  )
+                  EOT
+          calculate-options: --test-case-key=concat(@classname,"#",@name,"=>",normalize-space())
+          should-save-analysis-results-as-artifacts: true
+          redirecting-output: /dev/null
+          starting-points: << parameters.starting-points >>
+          test-results-path: << parameters.test-results-path >>
+jobs:
+  execute:
+    description: Calculate the difference of Goodcheck results between HEAD branch and BASE branch
+    parameters:
+      starting-points:
+        description: Specify the path of starting to search for files to analyze (Multiple paths can be specified by separating them with line feed)
+        type: string
+        default: "."
+      test-results-path:
+        description: Specify the value of the path parameter in the store_test_results step if you need to change it
+        type: string
+        default: "/tmp/test-results"
+    executor:
+      name: dscar/default
+      docker-image: circleci/ruby
+    steps:
+      - execute:
+          starting-points: << parameters.starting-points >>
+          test-results-path: << parameters.test-results-path >>
