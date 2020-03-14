@@ -1,0 +1,3 @@
+description: Install Goodcheck
+steps:
+  - run: sudo gem install goodcheck
