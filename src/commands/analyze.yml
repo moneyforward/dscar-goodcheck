@@ -4,6 +4,15 @@ parameters:
     description: Specify the path of starting to search for files to analyze (Multiple paths can be specified by separating them with line feed)
     type: string
     default: "."
+  patterns-to-include:
+    description: Specify patterns to include by regular expression (Multiple patterns can be specified by separating them with line feed)
+    type: string
+    default: ".*"
+  patterns-to-exclude:
+    description: Specify patterns to exclude by regular expression (Multiple patterns can be specified by separating them with line feed)
+    type: string
+    default: |
+        ^\./\.git/.*
   no-analysis-output-timeout:
     description: Elapsed time the command can run without output. The string is a decimal with unit suffix, such as “20m”, “1.25h”, “5s”
     type: string
@@ -29,14 +38,17 @@ steps:
               set -x
               cat \<<-EOT >> $BASH_ENV
               export TRANSFORMATION_ARGUMENTS=(
-                -rM
-                'map(@html "<file name=\"\(.path)\"><error source=\"\(.rule_id)\" line=\"\(.location.start_line + 0)\" column=\"\(.location.start_column + 0)\" severity=\"\" message=\"\(.message)\" /></file>") | "<checkstyle>\(join(""))</checkstyle>"'
+                -srM
+                'flatten | map(@html "<file name=\"\(.path)\"><error source=\"\(.rule_id)\" line=\"\(.location.start_line + 0)\" column=\"\(.location.start_column + 0)\" severity=\"\" message=\"\(.message)\" /></file>") | "<checkstyle>\(join(""))</checkstyle>"'
               )
               EOT
         - steps: << parameters.prepare >>
       analysis-command: goodcheck
       analysis-arguments: check --format=json
       transformation-command: jq
+      should-find: "true"
       starting-points: << parameters.starting-points >>
+      patterns-to-include: << parameters.patterns-to-include >>
+      patterns-to-exclude: << parameters.patterns-to-exclude >>
       no-output-timeout: << parameters.no-analysis-output-timeout >>
       redirecting-output: << parameters.redirecting-output >>
