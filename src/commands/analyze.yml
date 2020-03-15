@@ -22,6 +22,10 @@ parameters:
     type: steps
     default:
       - run: sudo gem install goodcheck
+  result-path:
+    description: Path to save analysis result
+    type: string
+    default: "/dev/null"
   redirecting-output:
     description: Specify "/dev/null" if you do not want to display the analysis results on the standard output
     type: enum
@@ -50,5 +54,6 @@ steps:
       starting-points: << parameters.starting-points >>
       patterns-to-include: << parameters.patterns-to-include >>
       patterns-to-exclude: << parameters.patterns-to-exclude >>
+      result-path: << parameters.result-path >>
       no-output-timeout: << parameters.no-analysis-output-timeout >>
       redirecting-output: << parameters.redirecting-output >>
