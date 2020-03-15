@@ -44,7 +44,7 @@ analyze:
   steps:
     - dscar/analyze-and-evaluate:
         is-target-branch-base: << parameters.is-target-branch-base >>
-        analysis-name: Goodcheck
+        analysis-name: &analysis-name Goodcheck
         analyze: << parameters.analyze >>
         analysis-results-path: << parameters.analysis-results-path >>
         test-results-path: << parameters.test-results-path >>
@@ -95,7 +95,7 @@ execute:
   steps:
     - run: sudo gem install goodcheck
     - dscar/execute-and-evaluate:
-        analysis-name: Goodcheck
+        analysis-name: *analysis-name
         analyze: << parameters.analyze >>
         analysis-results-path: << parameters.analysis-results-path >>
         calculate: << parameters.calculate >>
