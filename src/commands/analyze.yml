@@ -48,12 +48,15 @@ steps:
             name: export TRANSFORMATION_ARGUMENTS
             command: |
               set -x
-              cat \<<-EOT >> $BASH_ENV
-              export TRANSFORMATION_ARGUMENTS=(
-                -srM
-                'flatten | map(@html "<file name=\"\(.path)\"><error source=\"\(.rule_id)\" line=\"\(.location.start_line + 0)\" column=\"\(.location.start_column + 0)\" severity=\"\" message=\"\(.message)\" /></file>") | "<checkstyle>\(join(""))</checkstyle>"'
-              )
+              FILTER="$(
+              cat \<<-"EOT" | tr -s ' \n' ' '
+              flatten | map(@html "<file name=\"\(.path)\">
+              <error source=\"\(.rule_id)\" line=\"\(.location.start_line + 0)\" column=\"\(.location.start_column + 0)\" severity=\"\" message=\"\(.message)\" />
+              </file>") | "<checkstyle>\(join(""))</checkstyle>"
               EOT
+              )"
+              declare -ax TRANSFORMATION_ARGUMENTS=( -srM "$FILTER" )
+              echo "$(declare -p TRANSFORMATION_ARGUMENTS)" >> $BASH_ENV
         - steps: << parameters.prepare >>
       analysis-name: Goodcheck
       analysis-command: goodcheck
