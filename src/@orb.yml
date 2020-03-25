@@ -3,11 +3,11 @@ version: 2.1
 description: Delta Goodcheck reports
 
 display:
-  home_url: https://github.com/naokikimura/dscar-goodcheck
-  source_url: https://github.com/naokikimura/dscar-goodcheck
+  home_url: https://corp.moneyforward.com/
+  source_url: https://github.com/moneyforward/dscar-goodcheck
 
 orbs:
-  dscar: moneyforward/dscar@0.9.0
+  dscar: moneyforward/dscar@1.0.0
 
 executors:
   default:
