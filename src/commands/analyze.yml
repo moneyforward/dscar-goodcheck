@@ -43,11 +43,22 @@ steps:
   - dscar/analyze:
       step-name: Analyze code statically using Goodcheck
       prepare:
+        - steps: << parameters.prepare >>
         - run: sudo apt-get install jq
         - run:
-            name: export TRANSFORMATION_ARGUMENTS
+            name: declare -ax ANALYSIS_ARGUMENTS TRANSFORMATION_ARGUMENTS
             command: |
               set -x
+
+              declare -ax ANALYSIS_ARGUMENTS=(check "${ANALYSIS_ARGUMENTS[@]}")
+              if [ ! -e 'goodcheck.yml' ] || echo "${ANALYSIS_ARGUMENTS[@]}" | grep -qvE '(^|\s)(-c|--config(\s+|=))'
+              then
+                TEMP=$(mktemp)
+                echo 'rules: []' > "${TEMP}"
+                ANALYSIS_ARGUMENTS+=(-c "${TEMP}")
+              fi
+              echo "$(declare -p ANALYSIS_ARGUMENTS)" >> $BASH_ENV
+
               FILTER="$(
               cat \<<-"EOT" | tr -s ' \n' ' '
               flatten | map(@html "<file name=\"\(.path)\">
@@ -57,10 +68,9 @@ steps:
               )"
               declare -ax TRANSFORMATION_ARGUMENTS=( -srM "$FILTER" )
               echo "$(declare -p TRANSFORMATION_ARGUMENTS)" >> $BASH_ENV
-        - steps: << parameters.prepare >>
       analysis-name: Goodcheck
       analysis-command: goodcheck
-      analysis-arguments: check --format=json
+      analysis-arguments: --format=json
       error-pattern: << parameters.error-pattern >>
       transformation-command: jq
       should-find: "true"
