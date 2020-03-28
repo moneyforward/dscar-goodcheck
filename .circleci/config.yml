@@ -34,6 +34,7 @@ jobs:
       <<: *dscar-default-executor
     steps:
       - checkout
+      - run: "echo 'rules: []' > goodcheck.yml"
       - dscar-goodcheck/analyze
 
 workflows:
