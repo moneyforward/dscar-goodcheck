@@ -1,5 +1,7 @@
 # dscar-goodcheck
 
+[![CircleCI](https://circleci.com/gh/moneyforward/dscar-goodcheck.svg?style=svg)](https://circleci.com/gh/moneyforward/dscar-goodcheck)
+
 Delta [Goodcheck](https://sider.github.io/goodcheck/) reports running on CircleCI
 
 See https://circleci.com/orbs/registry/orb/moneyforward/dscar-goodcheck for details.

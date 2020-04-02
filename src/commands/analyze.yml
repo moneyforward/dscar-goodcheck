@@ -51,7 +51,7 @@ steps:
               set -x
 
               declare -ax ANALYSIS_ARGUMENTS=(check "${ANALYSIS_ARGUMENTS[@]}")
-              if [ ! -e 'goodcheck.yml' ] || echo "${ANALYSIS_ARGUMENTS[@]}" | grep -qvE '(^|\s)(-c|--config(\s+|=))'
+              if [ ! -e 'goodcheck.yml' ] && echo "${ANALYSIS_ARGUMENTS[@]}" | grep -qvE '(^|\s)(-c|--config(\s+|=))'
               then
                 TEMP=$(mktemp)
                 echo 'rules: []' > "${TEMP}"
