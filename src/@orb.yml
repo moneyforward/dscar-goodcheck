@@ -7,7 +7,7 @@ display:
   source_url: https://github.com/moneyforward/dscar-goodcheck
 
 orbs:
-  dscar: moneyforward/dscar@1.0.1
+  dscar: moneyforward/dscar@1.0.2
 
 executors:
   default:
@@ -26,6 +26,7 @@ executors:
       git-revision:
         description: "Please set << pipeline.git-revision >>"
         type: string
+        default: '0000000000000000000000000000000000000000'
       analysis-results-path:
         description: Specify the path to save the analysis results if you need to change it
         type: string
